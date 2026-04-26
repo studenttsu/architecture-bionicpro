@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-      "@react-keycloak/web": "^3.4.0",
+      "@casl/ability": "^6.7.0",\r\n      "@casl/react": "^4.0.0",\r\n      "@react-keycloak/web": "^3.4.0",
       "@types/node": "^16.18.0",
       "@types/react": "^18.0.0",
       "@types/react-dom": "^18.0.0",
