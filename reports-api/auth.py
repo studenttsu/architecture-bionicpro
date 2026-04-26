@@ -64,9 +64,8 @@ async def get_current_user(
                 detail="Unable to find appropriate signing key",
             )
 
-        issuer = (
-            f"{settings.keycloak_url}/realms/{settings.keycloak_realm}"
-        )
+        issuer_base = settings.keycloak_issuer_url or settings.keycloak_url
+        issuer = f"{issuer_base}/realms/{settings.keycloak_realm}"
 
         payload = jwt.decode(
             token,

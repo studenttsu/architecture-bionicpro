@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Keycloak
     keycloak_url: str = "http://localhost:8080"
+    keycloak_issuer_url: str = ""
     keycloak_realm: str = "reports-realm"
     keycloak_client_id: str = "reports-api"
     keycloak_client_secret: str = "oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq"
