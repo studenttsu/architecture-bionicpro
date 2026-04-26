@@ -2,6 +2,7 @@ import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { Can } from '@casl/react';
 import { useReport } from '../hooks/useReport';
+import ReportTable from './ReportTable';
 
 const ReportPage: React.FC = () => {
   const { keycloak, initialized } = useKeycloak();
@@ -88,40 +89,7 @@ const ReportPage: React.FC = () => {
               <p><strong>Total records:</strong> {reportData.total_records}</p>
             </div>
 
-            {reportData.reports.length === 0 ? (
-              <p className="text-gray-500">No report data available for the selected period.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border-collapse">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border p-2 text-left">Date</th>
-                      <th className="border p-2 text-left">Prosthesis</th>
-                      <th className="border p-2 text-right">Avg Reaction (ms)</th>
-                      <th className="border p-2 text-right">Movements</th>
-                      <th className="border p-2 text-right">Battery (%)</th>
-                      <th className="border p-2 text-right">Signal Quality</th>
-                      <th className="border p-2 text-right">Active Hours</th>
-                      <th className="border p-2 text-right">Anomalies</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reportData.reports.map((record, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="border p-2">{record.report_date}</td>
-                        <td className="border p-2">{record.prosthesis_id}</td>
-                        <td className="border p-2 text-right">{record.avg_reaction_time_ms.toFixed(1)}</td>
-                        <td className="border p-2 text-right">{record.total_movements}</td>
-                        <td className="border p-2 text-right">{record.avg_battery_level.toFixed(1)}</td>
-                        <td className="border p-2 text-right">{(record.signal_quality_avg * 100).toFixed(0)}%</td>
-                        <td className="border p-2 text-right">{record.active_hours.toFixed(1)}</td>
-                        <td className="border p-2 text-right">{record.anomaly_count}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <ReportTable data={reportData.reports} />
           </div>
         )}
       </div>
