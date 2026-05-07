@@ -47,25 +47,18 @@ docker-compose up -d --build
 > **Keycloak** стартует ~40–60 секунд (ожидает healthcheck PostgreSQL).  
 > **Airflow** стартует после того, как будут готовы все БД и ClickHouse — это ещё ~30–60 секунд.
 
-### 2. Запустить ETL DAG в Airflow
+### 2. Дождаться завершения ETL
 
-После старта стека откройте Airflow UI:
-
-```
-http://localhost:8081
-```
-
-Войдите: `admin` / `admin`
-
-Найдите DAG **`bionicpro_etl_reports`** и запустите его вручную:
-- нажмите кнопку ▶ (Trigger DAG)
+DAG **`bionicpro_etl_reports`** запускается **автоматически** примерно через 30–60 секунд после старта стека — сервис `airflow-trigger` триггерит его сразу, как только поднимается scheduler.
 
 DAG выполнит три шага:
 1. `extract_crm` — извлечь данные клиентов и протезов из CRM PostgreSQL
 2. `extract_telemetry` — извлечь телеметрию из Telemetry PostgreSQL
 3. `transform` → `load_to_clickhouse` — объединить и загрузить в `bionicpro.report_mart`
 
-После успешного завершения DAG данные будут доступны через Reports API и фронтенд.
+После завершения DAG данные доступны через Reports API и фронтенд.
+
+> Статус выполнения можно отследить в Airflow UI: http://localhost:8081 (`admin` / `admin`)
 
 ---
 

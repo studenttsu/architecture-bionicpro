@@ -219,5 +219,27 @@ services:
         condition: service_completed_successfully
     command: scheduler
 
+  # --- Автозапуск ETL DAG сразу после старта scheduler ---
+  airflow-trigger:
+    image: apache/airflow:2.7.3
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ''
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        echo "Waiting for scheduler to pick up DAGs..."
+        sleep 30
+        airflow dags trigger bionicpro_etl_reports
+        echo "DAG bionicpro_etl_reports triggered successfully"
+
 volumes:
   clickhouse-data:
