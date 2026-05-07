@@ -79,10 +79,10 @@ async def get_report(
     ensuring users can only access their own reports.
     Reports are only generated for periods already processed by Airflow.
     """
-    user_id = current_user["user_id"]
+    user_id = current_user["username"]
     logger.info(
-        f"Report requested by user_id={user_id} "
-        f"(username={current_user['username']})"
+        f"Report requested by username={user_id} "
+        f"(sub={current_user['user_id']})"
     )
 
     try:

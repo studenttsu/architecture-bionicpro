@@ -136,7 +136,11 @@ def load_to_clickhouse(**context):
 
     values_parts = []
     for row in merged_data:
-        last_cal = row["last_calibration_date"] or "1970-01-01 00:00:00"
+        raw_cal = row["last_calibration_date"]
+        if raw_cal:
+            last_cal = str(raw_cal)[:19]
+        else:
+            last_cal = "1970-01-01 00:00:00"
         values_parts.append(
             f"('{row['user_id']}', '{row['report_date']}', "
             f"'{row['username']}', '{row['email']}', "
