@@ -32,30 +32,40 @@
 docker-compose up -d --build
 ```
 
+Это поднимет весь стек:
+
 | Сервис | URL | Описание |
 |--------|-----|----------|
 | Keycloak | http://localhost:8080 | SSO (admin: `admin` / `admin`) |
 | Frontend | http://localhost:3000 | React SPA |
 | Reports API | http://localhost:8000 | FastAPI |
 | ClickHouse | http://localhost:8123 | OLAP БД |
+| Airflow UI | http://localhost:8081 | ETL (admin: `admin` / `admin`) |
+| CRM DB | localhost:5434 | PostgreSQL — источник CRM |
+| Telemetry DB | localhost:5435 | PostgreSQL — источник телеметрии |
 
-> Keycloak стартует ~40–60 секунд (ожидает готовности PostgreSQL через healthcheck).
+> **Keycloak** стартует ~40–60 секунд (ожидает healthcheck PostgreSQL).  
+> **Airflow** стартует после того, как будут готовы все БД и ClickHouse — это ещё ~30–60 секунд.
 
-### 2. Инициализировать ClickHouse
+### 2. Запустить ETL DAG в Airflow
 
-**Windows (PowerShell):**
-```powershell
-.\scripts\init_clickhouse.ps1
+После старта стека откройте Airflow UI:
+
+```
+http://localhost:8081
 ```
 
-**Linux / Mac:**
-```bash
-bash scripts/init_clickhouse.sh
-```
+Войдите: `admin` / `admin`
 
-> **Важно:** seed-данные используют placeholder `user_id = 'prothetic-user-1-uuid'`.
-> Замените его на реальный UUID пользователя `prothetic1` из Keycloak:
-> http://localhost:8080/admin → Users → prothetic1 → скопируйте ID
+Найдите DAG **`bionicpro_etl_reports`** и запустите его вручную:
+- нажмите кнопку ▶ (Trigger DAG)
+
+DAG выполнит три шага:
+1. `extract_crm` — извлечь данные клиентов и протезов из CRM PostgreSQL
+2. `extract_telemetry` — извлечь телеметрию из Telemetry PostgreSQL
+3. `transform` → `load_to_clickhouse` — объединить и загрузить в `bionicpro.report_mart`
+
+После успешного завершения DAG данные будут доступны через Reports API и фронтенд.
 
 ---
 
@@ -111,18 +121,6 @@ curl -i http://localhost:8000/reports
 
 ---
 
-## Запуск Airflow (ETL)
-
-```bash
-cd airflow
-docker-compose up -d
-```
-
-Airflow UI: http://localhost:8081
-
-Запустите DAG `bionicpro_etl_reports` — он заполнит `report_mart` реальными данными из CRM и Telemetry DB по расписанию `@daily`.
-
----
 
 ## Остановка
 
